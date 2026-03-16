@@ -1,0 +1,561 @@
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
+
+const prisma = new PrismaClient();
+
+async function main() {
+    console.log('🌱 Starting seed...');
+
+    // Create admin user
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+    const admin = await prisma.user.upsert({
+        where: { email: 'admin@hayyakgroup.com' },
+        update: {},
+        create: {
+            email: 'admin@hayyakgroup.com',
+            password: hashedPassword,
+            name: 'Admin',
+            role: 'admin',
+        },
+    });
+    console.log('✅ Admin user created');
+
+    // Create destinations
+    const destinations = [
+        {
+            slug: 'dubai-uae',
+            name_ar: 'دبي',
+            name_en: 'Dubai',
+            country: 'UAE',
+            city: 'Dubai',
+            description_ar: 'دبي، مدينة الأحلام والفخامة، حيث تلتقي الحداثة بالتراث العربي الأصيل. استمتع بأطول برج في العالم، أكبر مول تجاري، وأجمل الشواطئ الذهبية.',
+            description_en: 'Dubai, the city of dreams and luxury, where modernity meets authentic Arab heritage. Enjoy the tallest building in the world, the largest shopping mall, and the most beautiful golden beaches.',
+            bestTime_ar: 'من نوفمبر إلى مارس',
+            bestTime_en: 'November to March',
+            visaNotes_ar: 'تأشيرة سياحية متاحة عند الوصول لمعظم الجنسيات',
+            visaNotes_en: 'Tourist visa available on arrival for most nationalities',
+            images: JSON.stringify(['/images/destinations/dubai-1.jpg', '/images/destinations/dubai-2.jpg']),
+        },
+        {
+            slug: 'istanbul-turkey',
+            name_ar: 'إسطنبول',
+            name_en: 'Istanbul',
+            country: 'Turkey',
+            city: 'Istanbul',
+            description_ar: 'إسطنبول، المدينة التي تجمع بين قارتين وحضارتين. استكشف المساجد التاريخية، الأسواق التقليدية، والمطاعم الشهيرة على مضيق البوسفور.',
+            description_en: 'Istanbul, the city that bridges two continents and civilizations. Explore historic mosques, traditional bazaars, and famous restaurants along the Bosphorus.',
+            bestTime_ar: 'من أبريل إلى مايو ومن سبتمبر إلى أكتوبر',
+            bestTime_en: 'April to May and September to October',
+            visaNotes_ar: 'تأشيرة إلكترونية متاحة للعديد من الجنسيات',
+            visaNotes_en: 'E-visa available for many nationalities',
+            images: JSON.stringify(['/images/destinations/istanbul-1.jpg', '/images/destinations/istanbul-2.jpg']),
+        },
+        {
+            slug: 'makkah-saudi',
+            name_ar: 'مكة المكرمة',
+            name_en: 'Makkah',
+            country: 'Saudi Arabia',
+            city: 'Makkah',
+            description_ar: 'مكة المكرمة، أقدس بقعة على وجه الأرض للمسلمين. أدِّ مناسك العمرة في الحرم المكي الشريف واستمتع بالروحانية والسكينة.',
+            description_en: 'Makkah, the holiest place on earth for Muslims. Perform Umrah rituals at the Grand Mosque and enjoy spirituality and tranquility.',
+            bestTime_ar: 'طوال العام، مع تجنب أشهر الصيف الحارة',
+            bestTime_en: 'Year-round, avoiding hot summer months',
+            visaNotes_ar: 'تأشيرة عمرة مطلوبة',
+            visaNotes_en: 'Umrah visa required',
+            images: JSON.stringify(['/images/destinations/makkah-1.jpg', '/images/destinations/makkah-2.jpg']),
+        },
+        {
+            slug: 'cairo-egypt',
+            name_ar: 'القاهرة',
+            name_en: 'Cairo',
+            country: 'Egypt',
+            city: 'Cairo',
+            description_ar: 'القاهرة، مدينة الألف مئذنة وعاصمة الحضارة الفرعونية. شاهد الأهرامات، أبو الهول، والمتحف المصري الشهير.',
+            description_en: 'Cairo, the city of a thousand minarets and capital of Pharaonic civilization. See the Pyramids, Sphinx, and the famous Egyptian Museum.',
+            bestTime_ar: 'من أكتوبر إلى أبريل',
+            bestTime_en: 'October to April',
+            visaNotes_ar: 'تأشيرة عند الوصول متاحة للعديد من الجنسيات',
+            visaNotes_en: 'Visa on arrival available for many nationalities',
+            images: JSON.stringify(['/images/destinations/cairo-1.jpg', '/images/destinations/cairo-2.jpg']),
+        },
+        {
+            slug: 'kuala-lumpur-malaysia',
+            name_ar: 'كوالالمبور',
+            name_en: 'Kuala Lumpur',
+            country: 'Malaysia',
+            city: 'Kuala Lumpur',
+            description_ar: 'كوالالمبور، مدينة الأبراج التوأم والطبيعة الخلابة. استمتع بالتسوق، الطعام الآسيوي الشهير، والمعالم الحديثة.',
+            description_en: 'Kuala Lumpur, city of twin towers and stunning nature. Enjoy shopping, famous Asian cuisine, and modern landmarks.',
+            bestTime_ar: 'من مايو إلى يوليو ومن ديسمبر إلى فبراير',
+            bestTime_en: 'May to July and December to February',
+            visaNotes_ar: 'إعفاء من التأشيرة لمعظم الجنسيات العربية',
+            visaNotes_en: 'Visa exemption for most Arab nationalities',
+            images: JSON.stringify(['/images/destinations/kl-1.jpg', '/images/destinations/kl-2.jpg']),
+        },
+        {
+            slug: 'maldives',
+            name_ar: 'جزر المالديف',
+            name_en: 'Maldives',
+            country: 'Maldives',
+            city: 'Male',
+            description_ar: 'جزر المالديف، جنة الاستوائية على الأرض. استرخِ في المنتجعات الفاخرة، اغطس في المياه الزرقاء الصافية، واستمتع بأجمل غروب شمس.',
+            description_en: 'Maldives, a tropical paradise on earth. Relax in luxury resorts, dive in crystal clear blue waters, and enjoy the most beautiful sunsets.',
+            bestTime_ar: 'من نوفمبر إلى أبريل',
+            bestTime_en: 'November to April',
+            visaNotes_ar: 'تأشيرة مجانية عند الوصول لجميع الجنسيات',
+            visaNotes_en: 'Free visa on arrival for all nationalities',
+            images: JSON.stringify(['/images/destinations/maldives-1.jpg', '/images/destinations/maldives-2.jpg']),
+        },
+        {
+            slug: 'paris-france',
+            name_ar: 'باريس',
+            name_en: 'Paris',
+            country: 'France',
+            city: 'Paris',
+            description_ar: 'باريس، مدينة النور والرومانسية. زر برج إيفل، متحف اللوفر، وتجول في شوارع الشانزليزيه الساحرة.',
+            description_en: 'Paris, the city of light and romance. Visit the Eiffel Tower, Louvre Museum, and stroll through the charming Champs-Élysées.',
+            bestTime_ar: 'من أبريل إلى يونيو ومن سبتمبر إلى أكتوبر',
+            bestTime_en: 'April to June and September to October',
+            visaNotes_ar: 'تأشيرة شنغن مطلوبة',
+            visaNotes_en: 'Schengen visa required',
+            images: JSON.stringify(['/images/destinations/paris-1.jpg', '/images/destinations/paris-2.jpg']),
+        },
+        {
+            slug: 'bali-indonesia',
+            name_ar: 'بالي',
+            name_en: 'Bali',
+            country: 'Indonesia',
+            city: 'Denpasar',
+            description_ar: 'بالي، جزيرة الآلهة والطبيعة الساحرة. استمتع بالشواطئ الرملية، المعابد الهندوسية، وحقول الأرز الخضراء.',
+            description_en: 'Bali, the island of gods and enchanting nature. Enjoy sandy beaches, Hindu temples, and green rice terraces.',
+            bestTime_ar: 'من أبريل إلى أكتوبر',
+            bestTime_en: 'April to October',
+            visaNotes_ar: 'تأشيرة عند الوصول متاحة',
+            visaNotes_en: 'Visa on arrival available',
+            images: JSON.stringify(['/images/destinations/bali-1.jpg', '/images/destinations/bali-2.jpg']),
+        },
+    ];
+
+    for (const dest of destinations) {
+        await prisma.destination.upsert({
+            where: { slug: dest.slug },
+            update: dest,
+            create: dest,
+        });
+    }
+    console.log('✅ Destinations created');
+
+    // Get destination IDs
+    const dubai = await prisma.destination.findUnique({ where: { slug: 'dubai-uae' } });
+    const istanbul = await prisma.destination.findUnique({ where: { slug: 'istanbul-turkey' } });
+    const makkah = await prisma.destination.findUnique({ where: { slug: 'makkah-saudi' } });
+    const cairo = await prisma.destination.findUnique({ where: { slug: 'cairo-egypt' } });
+    const kl = await prisma.destination.findUnique({ where: { slug: 'kuala-lumpur-malaysia' } });
+    const maldives = await prisma.destination.findUnique({ where: { slug: 'maldives' } });
+    const paris = await prisma.destination.findUnique({ where: { slug: 'paris-france' } });
+    const bali = await prisma.destination.findUnique({ where: { slug: 'bali-indonesia' } });
+
+    // Create trips
+    const trips = [
+        {
+            slug: 'umrah-package-5-nights',
+            title_ar: 'عمرة اقتصادية - 5 ليالي',
+            title_en: 'Economy Umrah Package - 5 Nights',
+            destinationId: makkah!.id,
+            category: 'Umrah',
+            priceFrom: 450,
+            currency: 'JOD',
+            durationDays: 5,
+            rating: 4.8,
+            includesFlight: true,
+            includesHotel: true,
+            visaAssistance: true,
+            arabicGuide: true,
+            highlights_ar: JSON.stringify(['إقامة قريبة من الحرم', 'تأشيرة عمرة مضمونة', 'مرشد عربي متخصص', 'وجبات يومية']),
+            highlights_en: JSON.stringify(['Accommodation near Haram', 'Guaranteed Umrah visa', 'Specialized Arabic guide', 'Daily meals']),
+            overview_ar: 'برنامج عمرة اقتصادي مميز يشمل الإقامة في فنادق قريبة من الحرم المكي الشريف مع خدمات متكاملة.',
+            overview_en: 'Distinguished economy Umrah program including accommodation in hotels near the Grand Mosque with complete services.',
+            itinerary_ar: JSON.stringify([
+                { day: 1, title: 'الوصول إلى مكة', description: 'استقبال في المطار والتوجه للفندق' },
+                { day: 2, title: 'أداء العمرة', description: 'أداء مناسك العمرة بمرافقة مرشد' },
+                { day: 3, title: 'زيارة المعالم', description: 'زيارة غار حراء وجبل النور' },
+                { day: 4, title: 'يوم حر', description: 'وقت حر للعبادة والتسوق' },
+                { day: 5, title: 'المغادرة', description: 'التوجه للمطار والعودة' },
+            ]),
+            itinerary_en: JSON.stringify([
+                { day: 1, title: 'Arrival in Makkah', description: 'Airport reception and transfer to hotel' },
+                { day: 2, title: 'Perform Umrah', description: 'Perform Umrah rituals with guide' },
+                { day: 3, title: 'Visit Landmarks', description: 'Visit Hira Cave and Jabal Al-Nour' },
+                { day: 4, title: 'Free Day', description: 'Free time for worship and shopping' },
+                { day: 5, title: 'Departure', description: 'Transfer to airport and return' },
+            ]),
+            inclusions_ar: JSON.stringify(['تذاكر طيران ذهاب وعودة', 'إقامة 5 ليالي', 'وجبتي إفطار وعشاء', 'تأشيرة عمرة', 'مرشد عربي', 'نقل من وإلى المطار']),
+            inclusions_en: JSON.stringify(['Round-trip flight tickets', '5 nights accommodation', 'Breakfast and dinner', 'Umrah visa', 'Arabic guide', 'Airport transfers']),
+            exclusions_ar: JSON.stringify(['وجبة الغداء', 'المشتريات الشخصية', 'التأمين الصحي']),
+            exclusions_en: JSON.stringify(['Lunch', 'Personal purchases', 'Health insurance']),
+            images: JSON.stringify(['/images/trips/umrah-1.jpg', '/images/trips/umrah-2.jpg', '/images/trips/umrah-3.jpg']),
+            availableDates: JSON.stringify(['2026-03-01 to 2026-03-06', '2026-04-15 to 2026-04-20', '2026-05-10 to 2026-05-15']),
+            priceOptions: JSON.stringify({ single: 550, double: 450, triple: 400 }),
+            published: true,
+            featured: true,
+            popularity: 95,
+        },
+        {
+            slug: 'dubai-luxury-7-days',
+            title_ar: 'دبي الفاخرة - 7 أيام',
+            title_en: 'Luxury Dubai - 7 Days',
+            destinationId: dubai!.id,
+            category: 'Luxury',
+            priceFrom: 850,
+            currency: 'JOD',
+            durationDays: 7,
+            rating: 4.9,
+            includesFlight: true,
+            includesHotel: true,
+            visaAssistance: true,
+            arabicGuide: true,
+            highlights_ar: JSON.stringify(['إقامة في فندق 5 نجوم', 'جولة في برج خليفة', 'رحلة سفاري صحراوية', 'جولة تسوق في دبي مول']),
+            highlights_en: JSON.stringify(['5-star hotel stay', 'Burj Khalifa tour', 'Desert safari', 'Dubai Mall shopping tour']),
+            overview_ar: 'استمتع بتجربة فاخرة في دبي مع إقامة في أفخم الفنادق وجولات سياحية حصرية.',
+            overview_en: 'Enjoy a luxurious experience in Dubai with accommodation in the finest hotels and exclusive tours.',
+            itinerary_ar: JSON.stringify([
+                { day: 1, title: 'الوصول', description: 'استقبال VIP في المطار' },
+                { day: 2, title: 'برج خليفة', description: 'زيارة أعلى برج في العالم' },
+                { day: 3, title: 'سفاري صحراوية', description: 'رحلة في الصحراء مع عشاء بدوي' },
+                { day: 4, title: 'دبي مول', description: 'يوم تسوق وترفيه' },
+                { day: 5, title: 'نخلة جميرا', description: 'زيارة أتلانتس والشاطئ' },
+                { day: 6, title: 'يوم حر', description: 'استرخاء أو أنشطة اختيارية' },
+                { day: 7, title: 'المغادرة', description: 'التوجه للمطار' },
+            ]),
+            itinerary_en: JSON.stringify([
+                { day: 1, title: 'Arrival', description: 'VIP airport reception' },
+                { day: 2, title: 'Burj Khalifa', description: 'Visit the tallest building in the world' },
+                { day: 3, title: 'Desert Safari', description: 'Desert trip with Bedouin dinner' },
+                { day: 4, title: 'Dubai Mall', description: 'Shopping and entertainment day' },
+                { day: 5, title: 'Palm Jumeirah', description: 'Visit Atlantis and beach' },
+                { day: 6, title: 'Free Day', description: 'Relaxation or optional activities' },
+                { day: 7, title: 'Departure', description: 'Transfer to airport' },
+            ]),
+            inclusions_ar: JSON.stringify(['طيران درجة سياحية', 'فندق 5 نجوم 7 ليالي', 'إفطار يومي', 'جميع الجولات المذكورة', 'تأشيرة سياحية', 'نقل خاص']),
+            inclusions_en: JSON.stringify(['Economy class flights', '5-star hotel 7 nights', 'Daily breakfast', 'All mentioned tours', 'Tourist visa', 'Private transfers']),
+            exclusions_ar: JSON.stringify(['الغداء والعشاء', 'الأنشطة الاختيارية', 'النفقات الشخصية']),
+            exclusions_en: JSON.stringify(['Lunch and dinner', 'Optional activities', 'Personal expenses']),
+            images: JSON.stringify(['/images/trips/dubai-1.jpg', '/images/trips/dubai-2.jpg', '/images/trips/dubai-3.jpg']),
+            availableDates: JSON.stringify(['2026-02-10 to 2026-02-17', '2026-03-20 to 2026-03-27', '2026-11-05 to 2026-11-12']),
+            priceOptions: JSON.stringify({ single: 1100, double: 850, triple: 750 }),
+            published: true,
+            featured: true,
+            popularity: 88,
+        },
+        {
+            slug: 'istanbul-family-package',
+            title_ar: 'إسطنبول العائلية - 6 أيام',
+            title_en: 'Istanbul Family Package - 6 Days',
+            destinationId: istanbul!.id,
+            category: 'Family',
+            priceFrom: 520,
+            currency: 'JOD',
+            durationDays: 6,
+            rating: 4.7,
+            includesFlight: true,
+            includesHotel: true,
+            visaAssistance: true,
+            arabicGuide: true,
+            highlights_ar: JSON.stringify(['مناسب للعائلات', 'زيارة المعالم التاريخية', 'جولة بحرية في البوسفور', 'تسوق في الأسواق التقليدية']),
+            highlights_en: JSON.stringify(['Family-friendly', 'Historical landmarks tour', 'Bosphorus cruise', 'Traditional markets shopping']),
+            overview_ar: 'برنامج عائلي متكامل لاستكشاف إسطنبول الساحرة مع أنشطة مناسبة لجميع الأعمار.',
+            overview_en: 'Complete family program to explore charming Istanbul with activities suitable for all ages.',
+            itinerary_ar: JSON.stringify([
+                { day: 1, title: 'الوصول', description: 'استقبال في المطار والتوجه للفندق' },
+                { day: 2, title: 'المدينة القديمة', description: 'زيارة آيا صوفيا والجامع الأزرق' },
+                { day: 3, title: 'قصر توب كابي', description: 'جولة في القصر العثماني' },
+                { day: 4, title: 'البوسفور', description: 'رحلة بحرية ساحرة' },
+                { day: 5, title: 'التسوق', description: 'زيارة البازار الكبير ومول إسطنبول' },
+                { day: 6, title: 'المغادرة', description: 'توديع وعودة' },
+            ]),
+            itinerary_en: JSON.stringify([
+                { day: 1, title: 'Arrival', description: 'Airport reception and hotel transfer' },
+                { day: 2, title: 'Old City', description: 'Visit Hagia Sophia and Blue Mosque' },
+                { day: 3, title: 'Topkapi Palace', description: 'Ottoman palace tour' },
+                { day: 4, title: 'Bosphorus', description: 'Charming boat cruise' },
+                { day: 5, title: 'Shopping', description: 'Visit Grand Bazaar and Istanbul Mall' },
+                { day: 6, title: 'Departure', description: 'Farewell and return' },
+            ]),
+            inclusions_ar: JSON.stringify(['طيران ذهاب وعودة', 'فندق 4 نجوم', 'إفطار يومي', 'جميع الجولات', 'مرشد عربي', 'تأشيرة']),
+            inclusions_en: JSON.stringify(['Round-trip flights', '4-star hotel', 'Daily breakfast', 'All tours', 'Arabic guide', 'Visa']),
+            exclusions_ar: JSON.stringify(['الوجبات الأخرى', 'دخول المتاحف', 'التسوق الشخصي']),
+            exclusions_en: JSON.stringify(['Other meals', 'Museum entries', 'Personal shopping']),
+            images: JSON.stringify(['/images/trips/istanbul-1.jpg', '/images/trips/istanbul-2.jpg']),
+            availableDates: JSON.stringify(['2026-04-01 to 2026-04-07', '2026-09-15 to 2026-09-21']),
+            priceOptions: JSON.stringify({ single: 650, double: 520, triple: 480 }),
+            published: true,
+            featured: true,
+            popularity: 82,
+        },
+        {
+            slug: 'maldives-honeymoon',
+            title_ar: 'شهر عسل المالديف - 5 ليالي',
+            title_en: 'Maldives Honeymoon - 5 Nights',
+            destinationId: maldives!.id,
+            category: 'Honeymoon',
+            priceFrom: 1200,
+            currency: 'JOD',
+            durationDays: 5,
+            rating: 5.0,
+            includesFlight: true,
+            includesHotel: true,
+            visaAssistance: false,
+            arabicGuide: false,
+            highlights_ar: JSON.stringify(['فيلا مائية خاصة', 'عشاء رومانسي على الشاطئ', 'جلسة سبا للزوجين', 'أنشطة مائية مجانية']),
+            highlights_en: JSON.stringify(['Private water villa', 'Romantic beach dinner', 'Couples spa session', 'Free water activities']),
+            overview_ar: 'باقة شهر عسل فاخرة في جزر المالديف مع إقامة في فيلا مائية خاصة وخدمات رومانسية حصرية.',
+            overview_en: 'Luxury honeymoon package in Maldives with private water villa stay and exclusive romantic services.',
+            itinerary_ar: JSON.stringify([
+                { day: 1, title: 'الوصول', description: 'استقبال وتوصيل بالقارب السريع' },
+                { day: 2, title: 'استرخاء', description: 'يوم حر في المنتجع' },
+                { day: 3, title: 'غطس', description: 'رحلة غطس في الشعاب المرجانية' },
+                { day: 4, title: 'عشاء رومانسي', description: 'عشاء خاص على الشاطئ' },
+                { day: 5, title: 'المغادرة', description: 'توديع وعودة' },
+            ]),
+            itinerary_en: JSON.stringify([
+                { day: 1, title: 'Arrival', description: 'Reception and speedboat transfer' },
+                { day: 2, title: 'Relaxation', description: 'Free day at resort' },
+                { day: 3, title: 'Snorkeling', description: 'Coral reef snorkeling trip' },
+                { day: 4, title: 'Romantic Dinner', description: 'Private beach dinner' },
+                { day: 5, title: 'Departure', description: 'Farewell and return' },
+            ]),
+            inclusions_ar: JSON.stringify(['طيران', 'فيلا مائية 5 ليالي', 'جميع الوجبات', 'عشاء رومانسي', 'سبا للزوجين', 'أنشطة مائية']),
+            inclusions_en: JSON.stringify(['Flights', 'Water villa 5 nights', 'All meals', 'Romantic dinner', 'Couples spa', 'Water activities']),
+            exclusions_ar: JSON.stringify(['المشروبات الكحولية', 'الأنشطة الإضافية', 'النفقات الشخصية']),
+            exclusions_en: JSON.stringify(['Alcoholic beverages', 'Extra activities', 'Personal expenses']),
+            images: JSON.stringify(['/images/trips/maldives-1.jpg', '/images/trips/maldives-2.jpg']),
+            availableDates: JSON.stringify(['2026-02-14 to 2026-02-19', '2026-06-01 to 2026-06-06', '2026-12-20 to 2026-12-25']),
+            priceOptions: JSON.stringify({ double: 1200 }),
+            published: true,
+            featured: true,
+            popularity: 90,
+        },
+        {
+            slug: 'cairo-pyramids-adventure',
+            title_ar: 'مغامرة الأهرامات - 4 أيام',
+            title_en: 'Pyramids Adventure - 4 Days',
+            destinationId: cairo!.id,
+            category: 'Adventure',
+            priceFrom: 380,
+            currency: 'JOD',
+            durationDays: 4,
+            rating: 4.6,
+            includesFlight: true,
+            includesHotel: true,
+            visaAssistance: true,
+            arabicGuide: true,
+            highlights_ar: JSON.stringify(['زيارة الأهرامات وأبو الهول', 'المتحف المصري', 'جولة في خان الخليلي', 'رحلة نيلية']),
+            highlights_en: JSON.stringify(['Visit Pyramids and Sphinx', 'Egyptian Museum', 'Khan El Khalili tour', 'Nile cruise']),
+            overview_ar: 'رحلة مثيرة لاستكشاف عجائب مصر القديمة والحديثة في القاهرة.',
+            overview_en: 'Exciting trip to explore the ancient and modern wonders of Egypt in Cairo.',
+            itinerary_ar: JSON.stringify([
+                { day: 1, title: 'الوصول', description: 'استقبال والتوجه للفندق' },
+                { day: 2, title: 'الأهرامات', description: 'زيارة الأهرامات الثلاثة وأبو الهول' },
+                { day: 3, title: 'المتحف المصري', description: 'جولة في المتحف وخان الخليلي' },
+                { day: 4, title: 'المغادرة', description: 'رحلة نيلية قصيرة والعودة' },
+            ]),
+            itinerary_en: JSON.stringify([
+                { day: 1, title: 'Arrival', description: 'Reception and hotel transfer' },
+                { day: 2, title: 'Pyramids', description: 'Visit three pyramids and Sphinx' },
+                { day: 3, title: 'Egyptian Museum', description: 'Museum and Khan El Khalili tour' },
+                { day: 4, title: 'Departure', description: 'Short Nile cruise and return' },
+            ]),
+            inclusions_ar: JSON.stringify(['طيران', 'فندق 3 نجوم', 'إفطار', 'جميع الجولات', 'مرشد', 'تأشيرة']),
+            inclusions_en: JSON.stringify(['Flights', '3-star hotel', 'Breakfast', 'All tours', 'Guide', 'Visa']),
+            exclusions_ar: JSON.stringify(['الغداء والعشاء', 'دخول المواقع', 'الإكراميات']),
+            exclusions_en: JSON.stringify(['Lunch and dinner', 'Site entries', 'Tips']),
+            images: JSON.stringify(['/images/trips/cairo-1.jpg', '/images/trips/cairo-2.jpg']),
+            availableDates: JSON.stringify(['2026-03-10 to 2026-03-14', '2026-10-15 to 2026-10-19']),
+            priceOptions: JSON.stringify({ single: 480, double: 380, triple: 350 }),
+            published: true,
+            featured: false,
+            popularity: 75,
+        },
+        {
+            slug: 'kuala-lumpur-weekend',
+            title_ar: 'عطلة نهاية أسبوع في كوالالمبور',
+            title_en: 'Kuala Lumpur Weekend Getaway',
+            destinationId: kl!.id,
+            category: 'Weekend',
+            priceFrom: 320,
+            currency: 'JOD',
+            durationDays: 3,
+            rating: 4.5,
+            includesFlight: true,
+            includesHotel: true,
+            visaAssistance: false,
+            arabicGuide: false,
+            highlights_ar: JSON.stringify(['برجا بتروناس', 'كهوف باتو', 'تسوق في بافيليون', 'طعام آسيوي أصيل']),
+            highlights_en: JSON.stringify(['Petronas Towers', 'Batu Caves', 'Pavilion shopping', 'Authentic Asian food']),
+            overview_ar: 'عطلة قصيرة مثالية لاستكشاف أبرز معالم كوالالمبور.',
+            overview_en: 'Perfect short break to explore Kuala Lumpur\'s top attractions.',
+            itinerary_ar: JSON.stringify([
+                { day: 1, title: 'الوصول', description: 'وصول وجولة مسائية' },
+                { day: 2, title: 'المعالم', description: 'برجا بتروناس وكهوف باتو' },
+                { day: 3, title: 'التسوق والمغادرة', description: 'تسوق والعودة' },
+            ]),
+            itinerary_en: JSON.stringify([
+                { day: 1, title: 'Arrival', description: 'Arrival and evening tour' },
+                { day: 2, title: 'Attractions', description: 'Petronas Towers and Batu Caves' },
+                { day: 3, title: 'Shopping & Departure', description: 'Shopping and return' },
+            ]),
+            inclusions_ar: JSON.stringify(['طيران', 'فندق 4 نجوم', 'إفطار', 'جولات', 'نقل']),
+            inclusions_en: JSON.stringify(['Flights', '4-star hotel', 'Breakfast', 'Tours', 'Transfers']),
+            exclusions_ar: JSON.stringify(['وجبات أخرى', 'تسوق', 'نفقات شخصية']),
+            exclusions_en: JSON.stringify(['Other meals', 'Shopping', 'Personal expenses']),
+            images: JSON.stringify(['/images/trips/kl-1.jpg', '/images/trips/kl-2.jpg']),
+            availableDates: JSON.stringify(['2026-05-01 to 2026-05-04', '2026-08-15 to 2026-08-18']),
+            priceOptions: JSON.stringify({ single: 420, double: 320, triple: 290 }),
+            published: true,
+            featured: false,
+            popularity: 68,
+        },
+    ];
+
+    for (const trip of trips) {
+        await prisma.trip.upsert({
+            where: { slug: trip.slug },
+            update: trip,
+            create: trip,
+        });
+    }
+    console.log('✅ Trips created');
+
+    // Create blog posts
+    const blogPosts = [
+        {
+            slug: 'best-time-visit-dubai',
+            title_ar: 'أفضل وقت لزيارة دبي',
+            title_en: 'Best Time to Visit Dubai',
+            content_ar: 'دبي وجهة سياحية رائعة على مدار العام، لكن أفضل وقت لزيارتها هو من نوفمبر إلى مارس حيث يكون الطقس معتدلاً ومثالياً للأنشطة الخارجية. في هذه الفترة، تتراوح درجات الحرارة بين 20-30 درجة مئوية، مما يجعلها مثالية للاستمتاع بالشواطئ والجولات السياحية.\n\nخلال أشهر الصيف (يونيو-سبتمبر)، ترتفع درجات الحرارة لتصل إلى 40 درجة مئوية أو أكثر، لكن هذا الوقت يشهد عروضاً وخصومات كبيرة في الفنادق والمولات.',
+            content_en: 'Dubai is a wonderful tourist destination year-round, but the best time to visit is from November to March when the weather is moderate and ideal for outdoor activities. During this period, temperatures range between 20-30°C, making it perfect for enjoying beaches and sightseeing.\n\nDuring summer months (June-September), temperatures rise to 40°C or more, but this time sees great offers and discounts in hotels and malls.',
+            excerpt_ar: 'اكتشف أفضل وقت لزيارة دبي والاستمتاع بطقسها الرائع',
+            excerpt_en: 'Discover the best time to visit Dubai and enjoy its wonderful weather',
+            category: 'Travel Tips',
+            coverImage: '/images/blog/dubai-weather.jpg',
+            tags: JSON.stringify(['دبي', 'نصائح سفر', 'طقس']),
+            published: true,
+        },
+        {
+            slug: 'umrah-preparation-guide',
+            title_ar: 'دليل الاستعداد للعمرة',
+            title_en: 'Umrah Preparation Guide',
+            content_ar: 'الاستعداد للعمرة يتطلب تحضيراً روحياً وجسدياً. إليك أهم النصائح:\n\n1. التحضير الروحي: تعلم مناسك العمرة وأدعيتها\n2. الوثائق: تأكد من صلاحية جواز السفر لمدة 6 أشهر\n3. الملابس: احضر ملابس إحرام مريحة وملابس عادية\n4. الصحة: راجع طبيبك وأحضر الأدوية الضرورية\n5. المال: احمل بطاقة ائتمان ومبلغ نقدي\n\nننصح بالحجز مع وكالة موثوقة لضمان رحلة مريحة وآمنة.',
+            content_en: 'Preparing for Umrah requires spiritual and physical preparation. Here are the most important tips:\n\n1. Spiritual Preparation: Learn Umrah rituals and prayers\n2. Documents: Ensure passport validity for 6 months\n3. Clothing: Bring comfortable Ihram clothes and regular clothes\n4. Health: Consult your doctor and bring necessary medications\n5. Money: Carry credit card and cash\n\nWe recommend booking with a trusted agency to ensure a comfortable and safe trip.',
+            excerpt_ar: 'نصائح مهمة للاستعداد لرحلة العمرة',
+            excerpt_en: 'Important tips for preparing for Umrah trip',
+            category: 'Religious Travel',
+            coverImage: '/images/blog/umrah-guide.jpg',
+            tags: JSON.stringify(['عمرة', 'دليل', 'نصائح']),
+            published: true,
+        },
+        {
+            slug: 'family-travel-tips',
+            title_ar: 'نصائح للسفر مع العائلة',
+            title_en: 'Family Travel Tips',
+            content_ar: 'السفر مع العائلة تجربة رائعة لكنها تحتاج تخطيطاً جيداً:\n\n• اختر وجهات صديقة للعائلات\n• احجز فنادق توفر غرف عائلية\n• خطط لأنشطة تناسب جميع الأعمار\n• احمل حقيبة إسعافات أولية\n• احجز رحلات مباشرة قدر الإمكان\n• احضر ألعاب وأنشطة للأطفال\n\nتذكر أن المرونة مهمة عند السفر مع الأطفال!',
+            content_en: 'Traveling with family is a wonderful experience but requires good planning:\n\n• Choose family-friendly destinations\n• Book hotels with family rooms\n• Plan activities suitable for all ages\n• Carry a first aid kit\n• Book direct flights when possible\n• Bring toys and activities for children\n\nRemember that flexibility is important when traveling with kids!',
+            excerpt_ar: 'كيف تخطط لرحلة عائلية ناجحة',
+            excerpt_en: 'How to plan a successful family trip',
+            category: 'Travel Tips',
+            coverImage: '/images/blog/family-travel.jpg',
+            tags: JSON.stringify(['عائلة', 'أطفال', 'نصائح']),
+            published: true,
+        },
+        {
+            slug: 'istanbul-hidden-gems',
+            title_ar: 'جواهر إسطنبول المخفية',
+            title_en: 'Istanbul Hidden Gems',
+            content_ar: 'إسطنبول مدينة مليئة بالكنوز السياحية. إليك بعض الأماكن الأقل شهرة:\n\n1. حي بلاط: الحي اليهودي التاريخي\n2. جزر الأميرات: هروب هادئ من صخب المدينة\n3. متحف الفسيفساء: كنز أثري مذهل\n4. شارع الاستقلال: للتسوق والمقاهي\n5. حديقة جولهانة: للاسترخاء\n\nهذه الأماكن ستمنحك تجربة أصيلة بعيداً عن الحشود السياحية.',
+            content_en: 'Istanbul is a city full of tourist treasures. Here are some lesser-known places:\n\n1. Balat: Historic Jewish quarter\n2. Princes\' Islands: Quiet escape from city hustle\n3. Mosaic Museum: Amazing archaeological treasure\n4. Istiklal Street: For shopping and cafes\n5. Gülhane Park: For relaxation\n\nThese places will give you an authentic experience away from tourist crowds.',
+            excerpt_ar: 'اكتشف الأماكن السرية في إسطنبول',
+            excerpt_en: 'Discover secret places in Istanbul',
+            category: 'Destinations',
+            coverImage: '/images/blog/istanbul-gems.jpg',
+            tags: JSON.stringify(['إسطنبول', 'وجهات', 'سياحة']),
+            published: true,
+        },
+        {
+            slug: 'budget-travel-hacks',
+            title_ar: 'حيل السفر الاقتصادي',
+            title_en: 'Budget Travel Hacks',
+            content_ar: 'السفر لا يجب أن يكون مكلفاً! إليك بعض الحيل:\n\n• احجز مبكراً للحصول على أفضل الأسعار\n• سافر في غير المواسم السياحية\n• استخدم تطبيقات مقارنة الأسعار\n• اختر إقامة اقتصادية\n• تناول الطعام في المطاعم المحلية\n• استخدم المواصلات العامة\n• ابحث عن الأنشطة المجانية\n\nبهذه الطرق يمكنك توفير الكثير!',
+            content_en: 'Travel doesn\'t have to be expensive! Here are some hacks:\n\n• Book early for best prices\n• Travel off-season\n• Use price comparison apps\n• Choose budget accommodation\n• Eat at local restaurants\n• Use public transport\n• Look for free activities\n\nWith these methods you can save a lot!',
+            excerpt_ar: 'كيف تسافر بميزانية محدودة',
+            excerpt_en: 'How to travel on a budget',
+            category: 'Travel Tips',
+            coverImage: '/images/blog/budget-travel.jpg',
+            tags: JSON.stringify(['ميزانية', 'توفير', 'نصائح']),
+            published: true,
+        },
+        {
+            slug: 'maldives-best-resorts',
+            title_ar: 'أفضل منتجعات المالديف',
+            title_en: 'Best Maldives Resorts',
+            content_ar: 'المالديف موطن لأفخم المنتجعات في العالم. إليك أفضلها:\n\n1. سونيفا فوشي: فخامة وخصوصية\n2. كونراد رانجالي: مطعم تحت الماء\n3. جيلي لانكانفوشي: بساطة فاخرة\n4. فور سيزونز لاندا جيرافارو: خدمة استثنائية\n5. أنانتارا فيلي: قيمة ممتازة\n\nكل منتجع يقدم تجربة فريدة من نوعها!',
+            content_en: 'Maldives is home to the world\'s most luxurious resorts. Here are the best:\n\n1. Soneva Fushi: Luxury and privacy\n2. Conrad Rangali: Underwater restaurant\n3. Gili Lankanfushi: Luxurious simplicity\n4. Four Seasons Landaa Giraavaru: Exceptional service\n5. Anantara Veli: Excellent value\n\nEach resort offers a unique experience!',
+            excerpt_ar: 'دليلك لاختيار أفضل منتجع في المالديف',
+            excerpt_en: 'Your guide to choosing the best resort in Maldives',
+            category: 'Destinations',
+            coverImage: '/images/blog/maldives-resorts.jpg',
+            tags: JSON.stringify(['المالديف', 'منتجعات', 'فنادق']),
+            published: true,
+        },
+    ];
+
+    for (const post of blogPosts) {
+        await prisma.blogPost.upsert({
+            where: { slug: post.slug },
+            update: post,
+            create: post,
+        });
+    }
+    console.log('✅ Blog posts created');
+
+    // Create site settings
+    const settings = [
+        { key: 'company_name_ar', value: 'حياك للسياحة والسفر' },
+        { key: 'company_name_en', value: 'HAYYAK Travel & Tourism' },
+        { key: 'company_email', value: process.env.COMPANY_EMAIL || 'info@hayyakgroup.com' },
+        { key: 'company_phone', value: process.env.COMPANY_PHONE || '+962790000000' },
+        { key: 'whatsapp_number', value: process.env.WHATSAPP_NUMBER || '+962790000000' },
+        { key: 'company_address_ar', value: process.env.COMPANY_ADDRESS_AR || 'عمان، الأردن' },
+        { key: 'company_address_en', value: process.env.COMPANY_ADDRESS_EN || 'Amman, Jordan' },
+        { key: 'hero_title_ar', value: 'اكتشف العالم معنا' },
+        { key: 'hero_title_en', value: 'Discover the World with Us' },
+        { key: 'hero_subtitle_ar', value: 'رحلات مميزة، ذكريات لا تُنسى' },
+        { key: 'hero_subtitle_en', value: 'Exceptional Trips, Unforgettable Memories' },
+        { key: 'facebook_url', value: 'https://facebook.com/hayyaktravel' },
+        { key: 'instagram_url', value: 'https://instagram.com/hayyaktravel' },
+        { key: 'twitter_url', value: 'https://twitter.com/hayyaktravel' },
+        { key: 'linkedin_url', value: 'https://linkedin.com/company/hayyaktravel' },
+    ];
+
+    for (const setting of settings) {
+        await prisma.siteSettings.upsert({
+            where: { key: setting.key },
+            update: { value: setting.value },
+            create: setting,
+        });
+    }
+    console.log('✅ Site settings created');
+
+    console.log('🎉 Seed completed successfully!');
+    console.log('\n📧 Admin credentials:');
+    console.log('Email: admin@hayyakgroup.com');
+    console.log('Password: admin123');
+}
+
+main()
+    .catch((e) => {
+        console.error('❌ Seed error:', e);
+        process.exit(1);
+    })
+    .finally(async () => {
+        await prisma.$disconnect();
+    });

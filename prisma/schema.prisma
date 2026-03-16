@@ -1,0 +1,142 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  password      String
+  image         String?
+  role          String    @default("admin")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Destination {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  name_ar      String
+  name_en      String
+  country      String
+  city         String?
+  description_ar String
+  description_en String
+  bestTime_ar  String?
+  bestTime_en  String?
+  visaNotes_ar String?
+  visaNotes_en String?
+  images       String   // JSON array of image URLs
+  published    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  trips        Trip[]
+}
+
+model Trip {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  title_ar        String
+  title_en        String
+  destinationId   String
+  destination     Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  category        String   // Umrah, Family, Honeymoon, Adventure, Business, Weekend, Cruise, Luxury
+  priceFrom       Float
+  currency        String   @default("JOD")
+  durationDays    Int
+  rating          Float    @default(0)
+  includesFlight  Boolean  @default(false)
+  includesHotel   Boolean  @default(false)
+  visaAssistance  Boolean  @default(false)
+  arabicGuide     Boolean  @default(false)
+  highlights_ar   String   // JSON array
+  highlights_en   String   // JSON array
+  overview_ar     String
+  overview_en     String
+  itinerary_ar    String   // JSON array of day-by-day
+  itinerary_en    String   // JSON array of day-by-day
+  inclusions_ar   String   // JSON array
+  inclusions_en   String   // JSON array
+  exclusions_ar   String   // JSON array
+  exclusions_en   String   // JSON array
+  images          String   // JSON array of image URLs
+  availableDates  String   // JSON array of date ranges
+  priceOptions    String   // JSON object with single/double/triple prices
+  published       Boolean  @default(true)
+  featured        Boolean  @default(false)
+  popularity      Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  bookingRequests BookingRequest[]
+}
+
+model BookingRequest {
+  id             String   @id @default(cuid())
+  tripId         String?
+  trip           Trip?    @relation(fields: [tripId], references: [id], onDelete: SetNull)
+  fullName       String
+  phone          String
+  email          String
+  nationality    String
+  travelersCount Int
+  dateFrom       String?
+  dateTo         String?
+  roomType       String?  // single, double, triple
+  budget         String?
+  notes          String?
+  status         String   @default("New") // New, Contacted, Confirmed, Cancelled
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title_ar    String
+  title_en    String
+  content_ar  String
+  content_en  String
+  excerpt_ar  String?
+  excerpt_en  String?
+  category    String
+  coverImage  String?
+  tags        String?  // JSON array
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  status    String   @default("New") // New, Read, Replied
+  createdAt DateTime @default(now())
+}
+
+model Newsletter {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model SiteSettings {
+  id         String   @id @default(cuid())
+  key        String   @unique
+  value      String
+  updatedAt  DateTime @updatedAt
+}
