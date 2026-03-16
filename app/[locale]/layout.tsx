@@ -3,7 +3,7 @@ import { Cairo } from 'next/font/google';
 import { Locale, locales, isRTL } from '@/lib/i18n';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import './globals.css';
+import '../globals.css';
 
 const cairo = Cairo({
     subsets: ['arabic', 'latin'],
