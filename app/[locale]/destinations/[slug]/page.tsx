@@ -1,5 +1,6 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { Locale, getTranslation } from '@/lib/i18n';
 import { prisma } from '@/lib/prisma';
 import { TripCard } from '@/components/trips/TripCard';
@@ -7,9 +8,9 @@ import { TripCard } from '@/components/trips/TripCard';
 export default async function DestinationDetailsPage({
     params,
 }: {
-    params: Promise<{ locale: Locale; slug: string }>;
+    params: Promise<{ locale: string; slug: string }>;
 }) {
-    const { locale, slug } = await params;
+    const { locale, slug } = await params as { locale: Locale; slug: string };
     const t = getTranslation(locale);
     const isRTL = locale === 'ar';
 
@@ -108,7 +109,7 @@ export default async function DestinationDetailsPage({
                             </h2>
                             {destination.trips.length > 0 ? (
                                 <div className="grid md:grid-cols-2 gap-8">
-                                    {destination.trips.map((trip) => (
+                                    {destination.trips.map((trip: any) => (
                                         <TripCard key={trip.id} trip={{ ...trip, destination }} locale={locale} />
                                     ))}
                                 </div>

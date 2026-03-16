@@ -8,9 +8,9 @@ import Link from 'next/link';
 export default async function BlogPostDetailsPage({
     params,
 }: {
-    params: Promise<{ locale: Locale; slug: string }>;
+    params: Promise<{ locale: string; slug: string }>;
 }) {
-    const { locale, slug } = await params;
+    const { locale, slug } = await params as { locale: Locale; slug: string };
     const t = getTranslation(locale);
     const isRTL = locale === 'ar';
 

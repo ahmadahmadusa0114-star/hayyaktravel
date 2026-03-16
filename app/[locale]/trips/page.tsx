@@ -136,7 +136,7 @@ export default async function TripsPage({
                                     }}
                                 >
                                     <option value="">{t.trips.categories.all}</option>
-                                    {destinations.map((dest) => (
+                                    {destinations.map((dest: any) => (
                                         <option key={dest.id} value={dest.id}>
                                             {locale === 'ar' ? dest.name_ar : dest.name_en}
                                         </option>
@@ -158,7 +158,7 @@ export default async function TripsPage({
                     {/* Trips Grid */}
                     {trips.length > 0 ? (
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {trips.map((trip) => (
+                            {trips.map((trip: any) => (
                                 <TripCard key={trip.id} trip={trip} locale={locale} />
                             ))}
                         </div>
