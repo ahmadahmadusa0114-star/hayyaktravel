@@ -6,9 +6,9 @@ import { Button } from '@/components/ui/Button';
 export default async function ServicesPage({
     params,
 }: {
-    params: Promise<{ locale: Locale }>;
+    params: Promise<{ locale: string }>;
 }) {
-    const { locale } = await params;
+    const { locale } = await params as { locale: Locale };
     const t = getTranslation(locale);
 
     const services = [

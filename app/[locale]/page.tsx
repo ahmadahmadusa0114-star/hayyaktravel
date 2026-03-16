@@ -7,9 +7,9 @@ import { NewsletterSection } from '@/components/home/NewsletterSection';
 export default async function HomePage({
     params,
 }: {
-    params: Promise<{ locale: Locale }>;
+    params: Promise<{ locale: string }>;
 }) {
-    const { locale } = await params;
+    const { locale } = await params as { locale: Locale };
     const t = getTranslation(locale);
 
     return (

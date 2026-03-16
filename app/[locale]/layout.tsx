@@ -19,9 +19,9 @@ export async function generateStaticParams() {
 export async function generateMetadata({
     params,
 }: {
-    params: Promise<{ locale: Locale }>;
+    params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
-    const { locale } = await params;
+    const { locale } = await params as { locale: Locale };
 
     return {
         title: locale === 'ar' ? 'حياك للسياحة والسفر' : 'HAYYAK Travel & Tourism',
@@ -40,9 +40,9 @@ export default async function RootLayout({
     params,
 }: {
     children: React.ReactNode;
-    params: Promise<{ locale: Locale }>;
+    params: Promise<{ locale: string }>;
 }) {
-    const { locale } = await params;
+    const { locale } = await params as { locale: Locale };
     const rtl = isRTL(locale);
 
     return (

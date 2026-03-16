@@ -6,9 +6,9 @@ import { DestinationCard } from '@/components/destinations/DestinationCard';
 export default async function DestinationsPage({
     params,
 }: {
-    params: Promise<{ locale: Locale }>;
+    params: Promise<{ locale: string }>;
 }) {
-    const { locale } = await params;
+    const { locale } = await params as { locale: Locale };
     const t = getTranslation(locale);
     const isRTL = locale === 'ar';
 

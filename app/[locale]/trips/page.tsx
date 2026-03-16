@@ -8,10 +8,10 @@ export default async function TripsPage({
     params,
     searchParams,
 }: {
-    params: Promise<{ locale: Locale }>;
+    params: Promise<{ locale: string }>;
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-    const { locale } = await params;
+    const { locale } = await params as { locale: Locale };
     const t = getTranslation(locale);
     const search = await searchParams;
 
